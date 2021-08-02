@@ -1,0 +1,28 @@
+trigger trg2 on Account(after Insert)
+{
+    Id i;
+    Set<String> existingEmail = new Set<String>(); 
+    List<Contact> contList = new List<Contact>();
+    List<Contact> conList = new List<Contact>();
+    List<Account> accList = [Select Id,Email,(Select lastname from Contacts) from Account where Name =: 'Testing'];
+    for(Account ac : accList)
+    {
+        contList.addAll(ac.Contacts);
+    }
+    if(trigger.isAfter && trigger.isInsert)
+    {
+        for(Account acc : trigger.new)
+        {
+            if(acc.Name == 'Testing')
+            {
+              i = acc.Id;
+            }
+        }
+    }
+    for(Contact con : contList)
+    {
+        con.AccountId = i;
+        conList.add(con);
+    }
+    update conList;
+}
